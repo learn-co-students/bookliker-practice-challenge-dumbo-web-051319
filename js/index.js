@@ -34,17 +34,17 @@ function getOneBook(event) {
 
 function likeBook(event) {
   const id = event.target.id.slice(12)
-  const likeStatus = checkLikeStatus(event);
+  // const likeStatus = checkLikeStatus(event);
   const userList = document.querySelectorAll('#users li');
   let users = []
   userList.forEach((user) => {
-    if(user.dataset.id != "1") {
+    // if(user.dataset.id != "1") {
       users.push({"id": user.dataset.id, "username": user.innerText});
-    }
+    // }
   })
-  if(likeStatus) {
+  // if(likeStatus) {
     users.push({"id": "1", "username": "pouros"});
-  }
+  // }
   // debugger;
   // debugger;
   let config = {
@@ -53,7 +53,7 @@ function likeBook(event) {
     body: JSON.stringify({"users": users})
   }
   fetch(`http://localhost:3000/books/${id}`, config)
-  changeLikeStatus(id);
+  // changeLikeStatus(id);
   // getAllBooks();
 }
 
@@ -95,27 +95,27 @@ function displayOneBook(book) {
     userList.append(li);
   });
 }
-
-function changeLikeStatus(id) {
-  const likeButton = document.querySelector(`#like-button-${id}`)
-  if(likeButton.innerText == "Like Book") {
-    likeButton.innerText = "Unlike Book";
-  } else {
-    likeButton.innerText = "Like Book";
-  }
-  // debugger;
-}
+//
+// function changeLikeStatus(id) {
+//   const likeButton = document.querySelector(`#like-button-${id}`)
+//   if(likeButton.innerText == "Like Book") {
+//     likeButton.innerText = "Unlike Book";
+//   } else {
+//     likeButton.innerText = "Like Book";
+//   }
+//   // debugger;
+// }
 
 // OTHER LOGIC
 
-function checkLikeStatus(event) {
-  if(event.target.innerText == "Like Book"){
-    var status = false
-  } else {
-    var status = true
-  }
-  return status;
-}
+// function checkLikeStatus(event) {
+//   if(event.target.innerText == "Like Book"){
+//     var status = false
+//   } else {
+//     var status = true
+//   }
+//   return status;
+// }
 
 // function userHash(json) {
 //   return json.users;
