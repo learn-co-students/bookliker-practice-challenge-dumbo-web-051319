@@ -6,86 +6,96 @@ const showPanel = document.querySelector('#show-panel');
 
 // EVENT LISTENERS
 
-document.addEventListener("DOMContentLoaded", getAllBooks);
-listPanel.addEventListener("click", getOneBook);
+document.addEventListener("DOMContentLoaded", passBooksToDisplay);
+listPanel.addEventListener("click", passOneBookToDisplay);
 
 // FETCHES
 
-function getAllBooks() {
-  const fetched = fetch('http://localhost:3000/books');
-  const respo = fetched.then((response) => response.json());
-  const json = respo.then((json) => displayBooks(json));
+function fetchAllBooks() {
+  return fetch('http://localhost:3000/books')
+    .then((response) => response.json());
 }
 
-function getOneBook(event) {
+function fetchOneBook(event) {
   const id = event.target.dataset.id;
-  fetch(`http://localhost:3000/books/${id}`)
-    .then((respo) => respo.json()).then((json) => displayOneBook(json))
+  return fetch(`http://localhost:3000/books/${id}`)
+    .then((respo) => respo.json());
   // debugger;
 }
 
-// function fetchUsers(id) {
-//   fetch(`http://localhost:3000/books/${id}`)
-//     .then((respo) => respo.json()).then((json) => {
-//       return json;
-//     })
-//     // debugger;
-// }
+function fetchBookForPageUpdate(event) {
+  // debugger;
+  const id = event.target.id.slice(12);
+  return fetch(`http://localhost:3000/books/${id}`)
+    .then((respo) => respo.json());
+}
 
-function likeBook(event) {
-  const id = event.target.id.slice(12)
-  // const likeStatus = checkLikeStatus(event);
+function fetchBookForPageUpdateJSON(json) {
+  // debugger;
+  const id = json.id;
+  return fetch(`http://localhost:3000/books/${id}`)
+    .then((respo) => respo.json());
+}
+
+
+function likeBook(json) {
+  // debugger;
+  const id = json.id
   const userList = document.querySelectorAll('#users li');
+  // debugger;
   let users = []
   userList.forEach((user) => {
-    // if(user.dataset.id != "1") {
       users.push({"id": user.dataset.id, "username": user.innerText});
-    // }
-  })
-  // if(likeStatus) {
+  });
     users.push({"id": "1", "username": "pouros"});
-  // }
-  // debugger;
-  // debugger;
+
   let config = {
     method: "PATCH",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({"users": users})
   }
-  fetch(`http://localhost:3000/books/${id}`, config)
-  // changeLikeStatus(id);
-  // getAllBooks();
+
+  fetch(`http://localhost:3000/books/${id}`, config).then((respo) => respo.json()).then((json) => displayOneBook(json));
+  // debugger;
+  // fetchBookForPageUpdateJSON(json).then((update) => displayUpdate(update));
 }
 
 // DOM MANIPULATION
 
-function displayBooks(booklist) {
-  booklist.forEach((book) => {
+// function displayUpdate(updatedJSON) {
+//   debugger;
+// }
+
+function displayBooks(json) {
+  // debugger;
+  json.forEach((book) => {
     li = document.createElement('li');
     li.innerText = `${book.title}`;
     li.dataset.id = `${book.id}`;
     list.append(li);
-    // debugger;
   });
 }
 
-function displayOneBook(book) {
+function displayOneBook(json) {
   // debugger;
+  console.log(json)
   // set button to display according to user 1
+
   showPanel.innerHTML = `
-    <h3>${book.title}</h3>
-    <img src=${book.img_url}/>
-    <p>${book.description}</p>
-    <button id='like-button-${book.id}'>Like Book</button>
+    <h3>${json.title}</h3>
+    <img src=${json.img_url}/>
+    <p>${json.description}</p>
+    <button id='like-button-${json.id}'>Like Book</button>
     <h5>Liked by:</h5>
     <ul id='users'></ul>
   `;
 
-  let likeButton = document.querySelector(`#like-button-${book.id}`)
-  likeButton.addEventListener('click', likeBook)
+  let likeButton = document.querySelector(`#like-button-${json.id}`)
+  likeButton.addEventListener('click', updatePage)
   let userList = document.querySelector('#users');
   // userList.addEventListener('click', function(event));
-  book.users.forEach((user) => {
+  // debugger;
+  json.users.forEach((user) => {
     let li = document.createElement('li');
     li.innerHTML = `${user.username}`;
     li.dataset.id = `${user.id}`;
@@ -95,29 +105,22 @@ function displayOneBook(book) {
     userList.append(li);
   });
 }
-//
-// function changeLikeStatus(id) {
-//   const likeButton = document.querySelector(`#like-button-${id}`)
-//   if(likeButton.innerText == "Like Book") {
-//     likeButton.innerText = "Unlike Book";
-//   } else {
-//     likeButton.innerText = "Like Book";
-//   }
-//   // debugger;
-// }
 
-// OTHER LOGIC
 
-// function checkLikeStatus(event) {
-//   if(event.target.innerText == "Like Book"){
-//     var status = false
-//   } else {
-//     var status = true
-//   }
-//   return status;
-// }
+// OTHER LOGIC ------------------------------------------------------
 
-// function userHash(json) {
-//   return json.users;
-//   debugger;
-// }
+function passBooksToDisplay() {
+  fetchAllBooks().then((json) => displayBooks(json));
+}
+
+function passOneBookToDisplay(event) {
+  // debugger;
+  // console.log(event);
+  fetchOneBook(event).then((json) => displayOneBook(json))
+}
+
+function updatePage(event) {
+  // debugger;
+    fetchBookForPageUpdate(event).then((json) => likeBook(json))
+    // debugger;
+  }
