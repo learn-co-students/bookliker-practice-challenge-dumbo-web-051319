@@ -39,25 +39,28 @@ function fetchBookForPageUpdateJSON(json) {
 
 
 function likeBook(json) {
-  // debugger;
   const id = json.id
   const userList = document.querySelectorAll('#users li');
-  // debugger;
   let users = []
   userList.forEach((user) => {
-      users.push({"id": user.dataset.id, "username": user.innerText});
+    users.push({"id": user.dataset.id, "username": user.innerText});
   });
+  let liked = checkLikeStatus(json);
+  if(!liked) {
     users.push({"id": "1", "username": "pouros"});
-
+  } else {
+      users.forEach((user, i) => {
+        if(user.username == "pouros") {
+            delete users[i];
+          }
+        });
+    }
   let config = {
     method: "PATCH",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({"users": users})
   }
-
   fetch(`http://localhost:3000/books/${id}`, config).then((respo) => respo.json()).then((json) => displayOneBook(json));
-  // debugger;
-  // fetchBookForPageUpdateJSON(json).then((update) => displayUpdate(update));
 }
 
 // DOM MANIPULATION
@@ -78,9 +81,6 @@ function displayBooks(json) {
 
 function displayOneBook(json) {
   // debugger;
-  console.log(json)
-  // set button to display according to user 1
-
   showPanel.innerHTML = `
     <h3>${json.title}</h3>
     <img src=${json.img_url}/>
@@ -89,7 +89,6 @@ function displayOneBook(json) {
     <h5>Liked by:</h5>
     <ul id='users'></ul>
   `;
-
   let likeButton = document.querySelector(`#like-button-${json.id}`)
   likeButton.addEventListener('click', updatePage)
   let userList = document.querySelector('#users');
@@ -122,5 +121,13 @@ function passOneBookToDisplay(event) {
 function updatePage(event) {
   // debugger;
     fetchBookForPageUpdate(event).then((json) => likeBook(json))
-    // debugger;
+}
+
+function checkLikeStatus(json) {
+  const likeButton = document.querySelector(`#like-button-${json.id}`);
+  if(likeButton.innerText == "Like Book") {
+    return false;
+  } else {
+    return true;
   }
+}
